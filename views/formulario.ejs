@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Formulario - BIS</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <div class="dashboard-wrapper">
+    <div class="dashboard-card">
+
+      <h1 class="title-left">Registro de Producto</h1>
+      <p class="subtitle-left">Ingreso de datos para análisis KPI</p>
+
+      <% if (mensaje) { %>
+        <div class="alert-success"><%= mensaje %></div>
+      <% } %>
+
+      <form action="/producto" method="POST">
+
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" name="nombre" required>
+          </div>
+
+          <div class="form-group">
+            <label>Categoría</label>
+            <input type="text" name="categoria" required>
+          </div>
+
+          <div class="form-group">
+            <label>Marca</label>
+            <input type="text" name="marca" required>
+          </div>
+
+          <div class="form-group">
+            <label>Modelo</label>
+            <input type="text" name="modelo" required>
+          </div>
+
+          <div class="form-group">
+            <label>Precio Compra</label>
+            <input type="number" name="precio_compra" required>
+          </div>
+
+          <div class="form-group">
+            <label>Precio Venta</label>
+            <input type="number" name="precio_venta" required>
+          </div>
+
+          <div class="form-group">
+            <label>Ventas</label>
+            <input type="number" name="ventas" required>
+          </div>
+
+          <div class="form-group">
+            <label>Stock</label>
+            <input type="number" name="stock" required>
+          </div>
+
+          <div class="form-group">
+            <label>Fecha</label>
+            <input type="date" name="fecha" required>
+          </div>
+
+        </div>
+
+        <div class="form-group">
+          <label for="modoEnvio">Destino del registro</label>
+          <select name="modoEnvio" id="modoEnvio" required>
+            <option value="seleccionada">Base de datos seleccionada</option>
+            <option value="todas">Enviar a las 3 bases de datos</option>
+          </select>
+        </div>
+
+        <div class="form-buttons">
+          <button type="submit" name="accion" value="continuar" class="btn-primary">
+            Guardar y continuar
+          </button>
+
+          <button type="submit" name="accion" value="kpi" class="btn-secondary">
+            Guardar y ver KPI
+          </button>
+        </div>
+
+      </form>
+
+      <div style="margin-top: 20px;">
+        <a href="/dashboard" class="btn-secondary">← Volver al Dashboard</a>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

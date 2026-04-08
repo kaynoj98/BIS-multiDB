@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard KPI - BIS</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <div class="kpi-wrapper">
+    <div class="kpi-header">
+      <h1 class="title-left">Dashboard KPI</h1>
+      <p class="subtitle-left">Sistema de Inteligencia de Negocios</p>
+      <div class="info-box">
+        <p><strong>Base seleccionada:</strong> <%= dbNombre %></p>
+      </div>
+    </div>
+
+    <div class="kpi-cards">
+      <div class="kpi-card">
+        <h3>Total Ganancia</h3>
+        <p>Q <%= data.reduce((sum, p) => sum + Number(p.ganancia || 0), 0).toFixed(2) %></p>
+      </div>
+
+      <div class="kpi-card">
+        <h3>Total Ingresos</h3>
+        <p>Q <%= data.reduce((sum, p) => sum + Number(p.ingresos || 0), 0).toFixed(2) %></p>
+      </div>
+
+      <div class="kpi-card">
+        <h3>Total Inversión</h3>
+        <p>Q <%= data.reduce((sum, p) => sum + Number(p.inversion || 0), 0).toFixed(2) %></p>
+      </div>
+
+      <div class="kpi-card">
+        <h3>Total Stock</h3>
+        <p><%= data.reduce((sum, p) => sum + Number(p.stock_total || 0), 0) %></p>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <h2 class="section-title">Detalle de Productos</h2>
+      <div class="table-responsive table-scroll">
+        <table class="kpi-table">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Categoría</th>
+              <th>Marca</th>
+              <th>Modelo</th>
+              <th>Ventas</th>
+              <th>Ganancia</th>
+              <th>Ingresos</th>
+              <th>Inversión</th>
+              <th>Stock</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% data.forEach(item => { %>
+              <tr>
+                <td><%= item.nombre %></td>
+                <td><%= item.categoria %></td>
+                <td><%= item.marca %></td>
+                <td><%= item.modelo %></td>
+                <td><%= item.ventas %></td>
+                <td>Q <%= Number(item.ganancia || 0).toFixed(2) %></td>
+                <td>Q <%= Number(item.ingresos || 0).toFixed(2) %></td>
+                <td>Q <%= Number(item.inversion || 0).toFixed(2) %></td>
+                <td><%= item.stock_total %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h2 class="section-title">Ganancia por Producto</h2>
+        <canvas id="graficaGanancia"></canvas>
+      </div>
+
+      <div class="chart-card">
+        <h2 class="section-title">Stock por Producto</h2>
+        <canvas id="graficaStock"></canvas>
+      </div>
+    </div>
+
+    <div class="kpi-actions">
+      <a href="/dashboard" class="btn-secondary">← Volver al Dashboard</a>
+      <a href="/formulario" class="btn-primary-link">+ Nuevo registro</a>
+      <a href="/logout" class="btn-danger">Cerrar sesión</a>
+    </div>
+
+  </div>
+
+  <script>
+    const nombres = <%- JSON.stringify(data.map(p => p.nombre)) %>;
+    const ganancias = <%- JSON.stringify(data.map(p => Number(p.ganancia || 0))) %>;
+    const stocks = <%- JSON.stringify(data.map(p => Number(p.stock_total || 0))) %>;
+
+    const ctxGanancia = document.getElementById('graficaGanancia').getContext('2d');
+    const ctxStock = document.getElementById('graficaStock').getContext('2d');
+
+    new Chart(ctxGanancia, {
+      type: 'doughnut',
+      data: {
+        labels: nombres,
+        datasets: [{
+          label: 'Ganancia',
+          data: ganancias,
+          backgroundColor: [
+            '#2563eb', '#16a34a', '#ea580c', '#9333ea', '#dc2626',
+            '#0891b2', '#ca8a04', '#4f46e5', '#0f766e', '#be123c'
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true
+      }
+    });
+
+    new Chart(ctxStock, {
+      type: 'bar',
+      data: {
+        labels: nombres,
+        datasets: [{
+          label: 'Stock',
+          data: stocks,
+          backgroundColor: '#2563eb',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <div class="dashboard-wrapper">
+    <div class="dashboard-card">
+      <div class="dashboard-header">
+        <h1 class="title-left">Bienvenido: <%= user %></h1>
+        <p class="subtitle-left">Sistema de Inteligencia de Negocios</p>
+      </div>
+
+      <div class="info-box">
+        <p><strong>Base de Datos Actual:</strong> <%= dbNombre %></p>
+      </div>
+
+      <form action="/seleccionar-db" method="POST" class="db-form">
+        <div class="form-group">
+          <label form="dbType">Seleccionar Base de Datos</label>
+          <select name="dbType" id="dbType" required>
+            <option value="">-- Seleccione una base de datos --</option>
+            <option value="postgres" <%= dbSeleccionada === 'postgres' ? 'selected' : '' %>>PostgreSQL</option>
+            <option value="sqlserver" <%= dbSeleccionada === 'sqlserver' ? 'selected' : '' %>>SQL Server</option>
+            <option value="oracle" <%= dbSeleccionada === 'oracle' ? 'selected' : '' %>>Oracle</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn-primary">Seleccionar</button>
+      </form>
+
+      <div class="dashboard-actions">
+        <a href="/formulario" class="btn-secondary">Ir al Formulario</a>
+        <a href="/kpi" class="btn-secondary">Ver Dashboard KPI</a>
+        <a href="/logout" class="btn-danger">Cerrar sesión</a>
+
+    </div>
+  </div>    
+</body>
+</html>
