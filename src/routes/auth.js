@@ -7,12 +7,6 @@ const {
   insertProductInAllDbs,
 } = require("../service/dbService");
 
-const {
-  getDataByDb,
-  insertProductByDb,
-  insertProductInAllDbs,
-} = require("../service/dbService");
-
 // ================================
 // RUTAS
 // ================================
@@ -126,7 +120,7 @@ router.get("/formulario", (req, res) => {
 });
 
 // Ruta para ingreso de productos dinámico
-router.post("/productos", async (req, res) => {
+router.post("/producto", async (req, res) => {
   try {
     if (!req.session.dbType) {
       return res.send(
@@ -151,6 +145,7 @@ router.post("/productos", async (req, res) => {
     if ((accion || "").toLowerCase() === "kpi") {
       return res.redirect("/kpi");
     }
+
     return res.redirect("/formulario");
   } catch (error) {
     console.error("Error al ingresar producto:", error);

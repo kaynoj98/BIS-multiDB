@@ -6,8 +6,6 @@ const pool = new Pool({
   database: "bis_db",
   password: "220198",
   port: 5432,
-  ssl: {
-    rejectUnauthorized: false, // Permitir conexiones sin verificar el certificado
-  },
+  ssl: false,
 });
 module.exports = pool;

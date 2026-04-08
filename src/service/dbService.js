@@ -45,15 +45,15 @@ async function insertPostgresProduct(data) {
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     `,
     [
-      nombre,
-      categoria,
-      marca,
-      modelo,
-      precio_compra,
-      precio_venta,
-      ventas,
-      stock,
-      fecha,
+      data.nombre,
+      data.categoria,
+      data.marca,
+      data.modelo,
+      data.precio_compra,
+      data.precio_venta,
+      data.ventas,
+      data.stock,
+      data.fecha,
     ],
   );
 }
