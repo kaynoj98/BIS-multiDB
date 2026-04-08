@@ -26,6 +26,7 @@ async function getPostgresData() {
 }
 
 async function insertPostgresProduct(data) {
+  console.log("Insertando en PostgreSQL CLOUD");
   const {
     nombre,
     categoria,
