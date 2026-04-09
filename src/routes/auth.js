@@ -7,40 +7,50 @@ const {
   insertProductInAllDbs,
 } = require("../service/dbService");
 
+const { enviarCodigo } = require("../service/emailService");
+
 // ================================
 // RUTAS
 // ================================
 
 // Usuario de prueba
 const user = {
-  username: "admin",
+  email: "kaynoj98@gmail.com",
   password: "$2b$10$SBpzOjPWv8aEYmuCjopyCu51kXM6zF0v6ZjH6L8zMe.2HSF7ALWG2",
 };
 
 // Ruta de login
 router.get("/login", (_, res) => {
   res.render("login", { error: null });
+  console.log("codigo generado:", codigo);
+  console.log("expira en:", new Date(req.session.codigoExpira));
 });
 
 router.post("/login", async (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
 
-  if (username !== user.username) {
-    return res.render("login", { error: "Usuario Incorrecto" });
+  if (email !== user.email) {
+    return res.render("login", { error: "Correo Incorrecto" });
   }
 
   const valid = await bcrypt.compare(password, user.password);
+
   if (!valid) {
     return res.render("login", { error: "Contraseña Incorrecta" });
   }
 
+  req.session.user = email;
+
   const codigo = Math.floor(100000 + Math.random() * 900000).toString();
 
-  req.session.pendingUser = username;
+  req.session.codigoExpira = Date.now() + 6000; // Tiempo de expiracion
+  req.session.pendingUser = email;
   req.session.twoFactorCode = codigo;
   req.session.twoFactorVerified = false;
+  req.session.usuarioEmail = email;
+  req.session.codigoExpira = Date.now() + 5 * 60 * 1000; // Expira en 5 minutos
 
-  console.log("Código 2FA generado:", codigo);
+  await enviarCodigo(email, codigo);
 
   return res.redirect("/verificar-2fa");
 });
@@ -51,22 +61,36 @@ router.get("/verificar-2fa", (req, res) => {
     return res.redirect("/login");
   }
   res.render("verify2fa", { error: null });
+  console.log("ahora:", new Date());
+  console.log("expira:", new Date(req.session.codigoExpira));
 });
 
 router.post("/verificar-2fa", (req, res) => {
   const { codigo } = req.body;
 
-  if (!req.session.pendingUser || !req.session.twoFactorCode) {
+  if (!req.session.twoFactorCode || !req.session.codigoExpira) {
     return res.redirect("/login");
   }
+
+  // Validar Expiración
+  if (Date.now() > req.session.codigoExpira) {
+    req.session.pendingUser = null;
+    req.session.twoFactorCode = null;
+    req.session.codigoExpira = null;
+
+    return res.render("verify2fa", { error: "Código expirado" });
+  }
+
+  // Validar codigo incorrecto
   if (codigo !== req.session.twoFactorCode) {
     return res.render("verify2fa", { error: "Código incorrecto" });
   }
+
   req.session.user = req.session.pendingUser;
   req.session.twoFactorVerified = true;
-
   req.session.pendingUser = null;
   req.session.twoFactorCode = null;
+  req.session.codigoExpira = null;
 
   return res.redirect("/dashboard");
 });
@@ -78,12 +102,7 @@ router.get("/dashboard", (req, res) => {
   }
   console.log("Seleccione Base de Datos en dashboard:", req.session.dbType);
 
-  function getDbDisplayName(dbType) {
-    if (dbType === "postgres") return "PostgreSQL";
-    if (dbType === "sqlserver") return "SQL Server";
-    if (dbType === "oracle") return "Oracle";
-    return "No seleccionada";
-  }
+  // agregar la funcion getDbDisplayName si se necesita
 
   res.render("dashboard", {
     user: req.session.user,
@@ -166,12 +185,7 @@ router.get("/kpi", async (req, res) => {
 
     const data = await getDataByDb(req.session.dbType);
 
-    function getDbDisplayName(dbType) {
-      if (dbType === "postgres") return "PostgreSQL";
-      if (dbType === "sqlserver") return "SQL Server";
-      if (dbType === "oracle") return "Oracle";
-      return "No seleccionada";
-    }
+    // agregar la funcion si hace falta para mostrar el nombre de la dase de datos
 
     res.render("kpi", {
       data,
@@ -214,3 +228,15 @@ router.get("/logout", (req, res) => {
     return res.redirect("/login");
   });
 });
+
+// Ruta Generar Codigo 2FA
+function generarCodigo() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+function getDbDisplayName(dbType) {
+  if (dbType === "postgres") return "PostgreSQL";
+  if (dbType === "sqlserver") return "SQL Server";
+  if (dbType === "oracle") return "Oracle";
+  return "No seleccionada";
+}

@@ -5,3 +5,5 @@ const pool = new Pool({
   password: "220198",
   port: 5432,
 });
+
+mnodule.exports = pool;
