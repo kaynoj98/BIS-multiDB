@@ -22,8 +22,6 @@ const user = {
 // Ruta de login
 router.get("/login", (_, res) => {
   res.render("login", { error: null });
-  console.log("codigo generado:", codigo);
-  console.log("expira en:", new Date(req.session.codigoExpira));
 });
 
 router.post("/login", async (req, res) => {
@@ -60,9 +58,9 @@ router.get("/verificar-2fa", (req, res) => {
   if (!req.session.pendingUser || !req.session.twoFactorCode) {
     return res.redirect("/login");
   }
-  res.render("verify2fa", { error: null });
   console.log("ahora:", new Date());
   console.log("expira:", new Date(req.session.codigoExpira));
+  return res.render("verify2fa", { error: null });
 });
 
 router.post("/verificar-2fa", (req, res) => {
@@ -78,7 +76,9 @@ router.post("/verificar-2fa", (req, res) => {
     req.session.twoFactorCode = null;
     req.session.codigoExpira = null;
 
-    return res.render("verify2fa", { error: "Código expirado" });
+    return res.render("verify2fa", {
+      error: "Código expirado, solicita uno nuevo ",
+    });
   }
 
   // Validar codigo incorrecto
